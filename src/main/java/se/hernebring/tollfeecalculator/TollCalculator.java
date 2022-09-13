@@ -6,6 +6,7 @@ import de.jollyday.HolidayManager;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -41,12 +42,12 @@ public class TollCalculator {
                vehicleType.equals(TollFreeVehicles.Tractor.toString()) ||
                vehicleType.equals(TollFreeVehicles.Emergency.toString()) ||
                vehicleType.equals(TollFreeVehicles.Diplomat.toString()) ||
-               vehicleType.equals(TollFreeVehicles.Foreign.toString()) ||
+               vehicleType.equals(TollFreeVehicles.Bus.toString()) ||
                vehicleType.equals(TollFreeVehicles.Military.toString());
     }
 
     public int getTollFee(LocalDateTime date, Vehicle vehicle) {
-        if (isTollFreeDate(date) || isTollFreeVehicle(vehicle)) 
+        if (TollDate.isFree(date) || isTollFreeVehicle(vehicle))
             return 0;
 
         int hour = date.getHour();
@@ -73,35 +74,6 @@ public class TollCalculator {
         else return 0;
     }
 
-    boolean isTollFreeDate(LocalDateTime date) {
-        if (date.getDayOfWeek() == DayOfWeek.SATURDAY | date.getDayOfWeek() == DayOfWeek.SUNDAY)
-            return true;
-
-        int month = date.getMonthValue();
-        final int july = 7;
-        if (month == july)
-            return true;
-
-        HolidayManager m = HolidayManager.getInstance(HolidayCalendar.SWEDEN);
-        if(m.isHoliday(LocalDate.from(date)))
-            return true;
-        int year = date.getYear();
-        int day = date.getDayOfMonth();
-
-        if (year == 2013) {
-            if (month == 1 && day == 1 ||
-                month == 3 && (day == 28 || day == 29) ||
-                month == 4 && (day == 1 || day == 30) ||
-                month == 5 && (day == 1 || day == 8 || day == 9) ||
-                month == 6 && (day == 5 || day == 6 || day == 21) ||
-                month == 7 ||
-                month == 11 && day == 1 ||
-                month == 12 && (day == 24 || day == 25 || day == 26 || day == 31)
-            )
-                return true;
-        }
-        return false;
-    }
 }
 
 enum TollFreeVehicles {
@@ -109,7 +81,7 @@ enum TollFreeVehicles {
     Tractor,
     Emergency,
     Diplomat,
-    Foreign,
+    Bus,
     Military
 }
 

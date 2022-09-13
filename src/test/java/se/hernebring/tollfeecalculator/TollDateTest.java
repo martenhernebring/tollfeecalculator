@@ -1,52 +1,56 @@
 package se.hernebring.tollfeecalculator;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TollCalculatorTest {
-
-    TollCalculator calculator = new TollCalculator();
+class TollDateTest {
     LocalTime lunch = LocalTime.of(12,54);
 
     @Test
     void workDayHasTollAtLunch() {
         LocalDate workDay = LocalDate.of(2022,9,12);
         LocalDateTime writtenIsTollDate = LocalDateTime.of(workDay, lunch);
-        assertFalse(calculator.isTollFreeDate(writtenIsTollDate));
+        assertFalse(TollDate.isFree(writtenIsTollDate));
     }
 
     @Test
     void sundayHasNoToll() {
         LocalDate sunday = LocalDate.of(2022,9,18);
         LocalDateTime noTollDate = LocalDateTime.of(sunday, lunch);
-        assertTrue(calculator.isTollFreeDate(noTollDate));
+        assertTrue(TollDate.isFree(noTollDate));
     }
 
     @Test
     void saturdayHasNoToll() {
         LocalDate saturday = LocalDate.of(2022,9,18);
         LocalDateTime noTollDate = LocalDateTime.of(saturday, lunch);
-        assertTrue(calculator.isTollFreeDate(noTollDate));
+        assertTrue(TollDate.isFree(noTollDate));
     }
 
     @Test
-    void workDayInJulyHasNoTollAtLunch() {
+    void workDayInJulyHasNoToll() {
         LocalDate workDayInJuly = LocalDate.of(2022,7,14);
         LocalDateTime noTollDate = LocalDateTime.of(workDayInJuly, lunch);
-        assertTrue(calculator.isTollFreeDate(noTollDate));
+        assertTrue(TollDate.isFree(noTollDate));
     }
 
     @Test
     void holidayWeekdayOutsideJulyHasNoToll() {
         LocalDate holidayWeekdayOutsideJuly = LocalDate.of(2022,1,6);
         LocalDateTime noTollDate = LocalDateTime.of(holidayWeekdayOutsideJuly, lunch);
-        assertTrue(calculator.isTollFreeDate(noTollDate));
+        assertTrue(TollDate.isFree(noTollDate));
+    }
+
+    @Test
+    void weekdayBeforeHolidayWeekdayOutsideJulyHasNoToll() {
+        LocalDate weekdayBeforeHolidayWeekdayOutsideJuly = LocalDate.of(2022,1,5);
+        LocalDateTime noTollDate = LocalDateTime.of(weekdayBeforeHolidayWeekdayOutsideJuly, lunch);
+        assertTrue(TollDate.isFree(noTollDate));
     }
 }
