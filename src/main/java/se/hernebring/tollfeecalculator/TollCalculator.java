@@ -16,9 +16,9 @@ public class TollCalculator {
             long minutes = ChronoUnit.MINUTES.between(intervalStart, date);
 
             if (minutes <= 60) {
-                if (totalFee > 0) 
+                if (totalFee > 0)
                     totalFee -= tempFee;
-                if (nextFee >= tempFee) 
+                if (nextFee > tempFee)
                     tempFee = nextFee;
                 totalFee += tempFee;
             } else {
@@ -37,23 +37,14 @@ public class TollCalculator {
         int hour = date.getHour();
         int minute = date.getMinute();
 
-        if (hour == 6 && minute >= 0 && minute <= 29) 
-            return 9;
-        else if (hour == 6 && minute >= 30 && minute <= 59) 
+        if (hour == 7 | hour == 16 | (hour == 15 && minute >= 30))
+            return 22;
+        else if ((hour == 6 && minute >= 30) |
+                (hour == 8 && minute <= 29) |
+                hour == 15 | hour == 17)
             return 16;
-        else if (hour == 7 && minute >= 0 && minute <= 59) 
-            return 18;
-        else if (hour == 8 && minute >= 0 && minute <= 29) 
-            return 16;
-        else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) 
-            return 9;
-        else if (hour == 15 && minute >= 0 && minute <= 29) 
-            return 16;
-        else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) 
-            return 18;
-        else if (hour == 17 && minute >= 0 && minute <= 59) 
-            return 16;
-        else if (hour == 18 && minute >= 0 && minute <= 29) 
+        else if ((hour >= 6 && hour <= 14) |
+                (hour == 18 && minute <= 29))
             return 9;
         else return 0;
     }
