@@ -120,4 +120,24 @@ class TollCalculatorTest {
         assertEquals(38, highAndMedium);
     }
 
+    @Test
+    void ordinaryVehicleEnteringThriceWithinAHourDuringNoLowAndMediumTrafficOnWeekdayLowestFirstPays16sek() {
+        Vehicle car = new Vehicle(Type.CAR);
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(5,58,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(6,15,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(6,32,59)));
+        int high = TollCalculator.getTollFee(car, traffic);
+        assertEquals(16, high);
+    }
+
+    @Test
+    void ordinaryVehicleThriceOverAHourDuringNoLowAndMediumTrafficOnWeekdayWhereFirstIs0SekPays16sek() {
+        Vehicle car = new Vehicle(Type.CAR);
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(5,30,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(6,15,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(6,45,59)));
+        int high = TollCalculator.getTollFee(car, traffic);
+        assertEquals(16, high);
+    }
+
 }

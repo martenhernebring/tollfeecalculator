@@ -11,19 +11,25 @@ public class TollCalculator {
         if(vehicle.isTollFree() || dates.isEmpty())
             return 0;
 
-        int totalFee = 0;
+        int totalFee = 0, previousFee, currentFee;
+        LocalDateTime previous, current;
         Iterator<LocalDateTime> sortedIterator = new TreeSet<>(dates).iterator();
-        LocalDateTime previous = sortedIterator.next();
-        int previousFee = getTollFee(previous);
+        do {
+            previous = sortedIterator.next();
+            previousFee = getTollFee(previous);
+        } while (previousFee <= 0 && sortedIterator.hasNext());
         totalFee += previousFee;
         while(sortedIterator.hasNext()) {
-            LocalDateTime current = sortedIterator.next();
+            do {
+                current = sortedIterator.next();
+                currentFee = getTollFee(current);
+            } while (currentFee <= 0 && sortedIterator.hasNext());
             var minutes = ChronoUnit.MINUTES.between(previous, current);
-            int currentFee = getTollFee(current);
             if(minutes <= 60) {
-                if(currentFee > previousFee)
+                if(currentFee > previousFee) {
                     totalFee = totalFee + currentFee - previousFee;
-
+                    previousFee = currentFee;
+                }
             } else {
                 totalFee += currentFee;
                 previous = current;
