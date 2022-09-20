@@ -2,31 +2,37 @@ package se.hernebring.tollfeecalculator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class TollCalculator {
-    public static int getTollFee(Vehicle vehicle, List<LocalDateTime> dates) {
-        if(vehicle.isTollFree())
+    public static int getTollFee(Vehicle vehicle, Set<LocalDateTime> dates) {
+        if(vehicle.isTollFree() || dates.isEmpty())
             return 0;
-        LocalDateTime intervalStart = dates.get(0);
-        int totalFee = 0;
-        for (LocalDateTime date : dates) {
-            int nextFee = getTollFee(date);
-            int tempFee = getTollFee(intervalStart);
-            long minutes = ChronoUnit.MINUTES.between(intervalStart, date);
 
-            if (minutes <= 60) {
-                if (totalFee > 0)
-                    totalFee -= tempFee;
-                if (nextFee > tempFee)
-                    tempFee = nextFee;
-                totalFee += tempFee;
+        int totalFee = 0;
+        Iterator<LocalDateTime> sortedIterator = new TreeSet<>(dates).iterator();
+        LocalDateTime previous = sortedIterator.next();
+        int previousFee = getTollFee(previous);
+        totalFee += previousFee;
+        while(sortedIterator.hasNext()) {
+            LocalDateTime current = sortedIterator.next();
+            var minutes = ChronoUnit.MINUTES.between(previous, current);
+            int currentFee = getTollFee(current);
+            if(minutes <= 60) {
+                if(currentFee > previousFee)
+                    totalFee = totalFee + currentFee - previousFee;
+
             } else {
-                totalFee += nextFee;
+                totalFee += currentFee;
+                previous = current;
+                previousFee = currentFee;
             }
         }
-        if (totalFee > 60) 
+        if (totalFee > 60)
             totalFee = 60;
+
         return totalFee;
     }
 

@@ -6,19 +6,19 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TollCalculatorTest {
 
-    private List<LocalDateTime> traffic;
-    private LocalDate workDate = LocalDate.of(2022,9,14);
+    private Set<LocalDateTime> traffic;
+    private final LocalDate workDate = LocalDate.of(2022,9,14);
 
     @BeforeEach
     void init() {
-        traffic = new ArrayList<>();
+        traffic = new HashSet<>();
     }
 
     @Test
@@ -57,14 +57,8 @@ class TollCalculatorTest {
     @Test
     void ordinaryVehicleDuringMediumTrafficOnWeekdayPaysTheHigherAmountWhenPassingTwice() {
         Vehicle car = new Vehicle(Type.TRUCK);
-        traffic.add(LocalDateTime.of(
-                LocalDate.of(2022,9,14),
-                LocalTime.of(6,29,59)
-        ));
-        traffic.add(LocalDateTime.of(
-                LocalDate.of(2022,9,14),
-                LocalTime.of(6,30,0)
-        ));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(6,29,59)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(6,30,0)));
         int mediumFee = TollCalculator.getTollFee(car, traffic);
         assertEquals(16, mediumFee);
     }
@@ -72,8 +66,8 @@ class TollCalculatorTest {
     @Test
     void ordinaryVehicleDuringHighAndMediumTrafficOnWeekdayWithOneHourBetweenPays38sek() {
         Vehicle car = new Vehicle(Type.CAR);
-        traffic.add(LocalDateTime.of(workDate, LocalTime.of(16,0,0)));
         traffic.add(LocalDateTime.of(workDate, LocalTime.of(17,30,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(16,0,0)));
         int highAndMedium = TollCalculator.getTollFee(car, traffic);
         assertEquals(38, highAndMedium);
     }
@@ -103,6 +97,27 @@ class TollCalculatorTest {
         ));
         int forFree = TollCalculator.getTollFee(car, traffic);
         assertEquals(0, forFree);
+    }
+
+    @Test
+    void ordinaryVehicleEnteringThriceWithinASecondDuringLowTrafficOnWeekdayPays9Sek() {
+        Vehicle smallBus = new Vehicle(Type.BUS);
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(8,45,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(8,45,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(8,45,0)));
+        int lowFee = TollCalculator.getTollFee(smallBus, traffic);
+        assertEquals(9, lowFee);
+    }
+
+    @Test
+    void ordinaryVehicleInGothenburgEnteringTwiceWithinAHourDuringHighAndMediumTrafficOnWeekdayWithOneHourBetweenThemPays38sek() {
+        Vehicle car = new Vehicle(Type.CAR);
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(18,29,59)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(16,0,0)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(16,59,59)));
+        traffic.add(LocalDateTime.of(workDate, LocalTime.of(17,30,0)));
+        int highAndMedium = TollCalculator.getTollFee(car, traffic);
+        assertEquals(38, highAndMedium);
     }
 
 }

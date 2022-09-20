@@ -20,9 +20,6 @@ class TollDate {
         HolidayManager m = HolidayManager.getInstance(HolidayCalendar.SWEDEN);
         if(m.isHoliday(LocalDate.from(date)))
             return true;
-        else if(m.isHoliday(LocalDate.from(date.plusDays(1L))))
-            return true;
-
-        return false;
+        else return m.isHoliday(LocalDate.from(date.plusDays(1L)));
     }
 }

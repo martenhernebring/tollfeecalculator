@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TollDateTest {
-    LocalTime lunch = LocalTime.of(12,54);
+    private final LocalTime lunch = LocalTime.of(12,54);
 
     @Test
     void workDayHasTollAtLunch() {
