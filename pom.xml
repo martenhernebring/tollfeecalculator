@@ -28,6 +28,11 @@
       <artifactId>jollyday</artifactId>
       <version>0.5.10</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>1.9.0</version>
+    </dependency>
   </dependencies>
 
   <build>

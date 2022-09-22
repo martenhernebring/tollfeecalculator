@@ -1,5 +1,11 @@
 package se.hernebring.tollfeecalculator;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
@@ -7,11 +13,29 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class TollCalculator {
-    public static int getTollFee(Vehicle vehicle, Set<LocalDateTime> dates) {
+
+    int low, medium, high;
+    long max;
+
+    public TollCalculator() throws IOException {
+        Reader in = new FileReader("src/main/resources/fees.csv");
+        String[] HEADERS = { "name", "fee"};
+        Iterable<CSVRecord> records = CSVFormat.DEFAULT
+                .withHeader(HEADERS)
+                .withFirstRecordAsHeader()
+                .parse(in);
+        var it = records.iterator();
+        low = Integer.parseInt(it.next().get("fee"));
+        medium = Integer.parseInt(it.next().get("fee"));
+        high = Integer.parseInt(it.next().get("fee"));
+        max = Long.parseLong(it.next().get("fee"));
+    }
+    public long getTollFee(Vehicle vehicle, Set<LocalDateTime> dates) {
         if(vehicle.isTollFree() || dates.isEmpty())
             return 0;
 
-        int totalFee = 0, previousFee, currentFee;
+        long totalFee = 0;
+        int previousFee, currentFee;
         LocalDateTime previous, current;
         Iterator<LocalDateTime> sortedIterator = new TreeSet<>(dates).iterator();
         do {
@@ -24,8 +48,8 @@ public class TollCalculator {
                 current = sortedIterator.next();
                 currentFee = getTollFee(current);
             } while (currentFee <= 0 && sortedIterator.hasNext());
-            var minutes = ChronoUnit.MINUTES.between(previous, current);
-            if(minutes <= 60) {
+            long minutes = ChronoUnit.MINUTES.between(previous, current);
+            if(minutes <= max) {
                 if(currentFee > previousFee) {
                     totalFee = totalFee + currentFee - previousFee;
                     previousFee = currentFee;
@@ -36,13 +60,13 @@ public class TollCalculator {
                 previousFee = currentFee;
             }
         }
-        if (totalFee > 60)
-            totalFee = 60;
+        if (totalFee > max)
+            totalFee = max;
 
         return totalFee;
     }
 
-    private static int getTollFee(LocalDateTime date) {
+    private int getTollFee(LocalDateTime date) {
         if (TollDate.isFree(date))
             return 0;
 
@@ -50,14 +74,14 @@ public class TollCalculator {
         int minute = date.getMinute();
 
         if (hour == 7 | hour == 16 | (hour == 15 && minute >= 30))
-            return 22;
+            return high;
         else if ((hour == 6 && minute >= 30) |
                 (hour == 8 && minute <= 29) |
                 hour == 15 | hour == 17)
-            return 16;
+            return medium;
         else if ((hour >= 6 && hour <= 14) |
                 (hour == 18 && minute <= 29))
-            return 9;
+            return low;
         else return 0;
     }
 
